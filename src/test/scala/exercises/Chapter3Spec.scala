@@ -1,8 +1,8 @@
 package exercises
 
-import org.scalatest.FlatSpec
-import exercises.Chapter3._
 import book_code.list._
+import exercises.Chapter3._
+import org.scalatest.FlatSpec
 
 class Chapter3Spec extends FlatSpec {
   "answer_3_1" should "match the correct answer" in {
@@ -35,5 +35,14 @@ class Chapter3Spec extends FlatSpec {
   "init" should "drop the last element from a list, if there is one" in {
     assert(init(List(1,2,3,4,5,6,7,8)) == List(1,2,3,4,5,6,7))
     assert(init(Nil) == Nil)
+  }
+
+  "length" should "give the length of a list" in {
+    assert(length(List(1,2,3)) == 3)
+    assert(length(Nil) == 0)
+  }
+
+  "myFoldLeft" should "fold like a champ" in {
+    assert(myFoldLeft(List(1,2,3), 0)(_ + _) == 6)
   }
 }

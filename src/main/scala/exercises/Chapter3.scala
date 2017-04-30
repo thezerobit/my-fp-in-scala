@@ -1,6 +1,7 @@
 package exercises
 
 import book_code.list._
+import book_code.list.List._
 
 object Chapter3 {
   // 3.1
@@ -44,8 +45,28 @@ object Chapter3 {
     }
     val reversed = reverse(list, Nil)
     reversed match {
-      case Cons(first, rest) => reverse(rest, Nil)
+      case Cons(_, rest) => reverse(rest, Nil)
       case Nil => Nil
     }
+  }
+
+  // 3.7
+  // no, foldRight itself has no mechanism for short-circuiting
+
+  // 3.8
+  def seeWhatHappens(): Unit = {
+    println(foldRight(List(1,2,3), Nil: List[Int])(Cons(_,_)))
+  }
+  // The application of the provided function in foldRight correlates to
+  // each Cons construction
+
+  // 3.9
+  def length[A](list: List[A]): Int = foldRight(list, 0)((_,y) => 1 + y)
+
+  // 3.10
+  @annotation.tailrec
+  def myFoldLeft[A,B](list: List[A], initial: B)(f: (B, A) => B): B = list match {
+    case Cons(first, rest) => myFoldLeft(rest,f(initial, first))(f)
+    case Nil => initial
   }
 }
