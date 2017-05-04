@@ -48,21 +48,4 @@ def sum(ints: List[Int]): Int = ints match { // A function that uses pattern mat
 
   def product2(ns: List[Double]) =
     foldRight(ns, 1.0)(_ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
-
-
-  def tail[A](l: List[A]): List[A] = ???
-
-  def setHead[A](l: List[A], h: A): List[A] = ???
-
-  def drop[A](l: List[A], n: Int): List[A] = ???
-
-  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = ???
-
-  def init[A](l: List[A]): List[A] = ???
-
-  def length[A](l: List[A]): Int = ???
-
-  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = ???
-
-  def map[A,B](l: List[A])(f: A => B): List[B] = ???
 }

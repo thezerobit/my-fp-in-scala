@@ -65,8 +65,95 @@ object Chapter3 {
 
   // 3.10
   @annotation.tailrec
-  def myFoldLeft[A,B](list: List[A], initial: B)(f: (B, A) => B): B = list match {
-    case Cons(first, rest) => myFoldLeft(rest,f(initial, first))(f)
+  def foldLeft[A,B](list: List[A], initial: B)(f: (B, A) => B): B = list match {
+    case Cons(first, rest) => foldLeft(rest,f(initial, first))(f)
     case Nil => initial
   }
+
+  // 3.11
+  def mySum(list: List[Int]): Int = foldLeft(list, 0)(_ + _)
+
+  def myProduct(list: List[Int]): Int = foldLeft(list, 1)(_ * _)
+
+  def myLength(list: List[Int]): Int = foldLeft(list, 0)((count, _) => count + 1)
+
+  // 3.12
+  def reverse[A](list: List[A]): List[A] = {
+    @annotation.tailrec
+    def _reverse(l: List[A], accum: List[A]): List[A] = l match {
+      case Cons(first, rest) => _reverse(rest, Cons(first, accum))
+      case Nil => accum
+    }
+    _reverse(list, Nil)
+  }
+
+  def reverse2[A](list: List[A]): List[A] = {
+    foldLeft[A,List[A]](list, Nil)((b, a) => Cons(a, b))
+  }
+
+  // 3.13
+  def foldLeft2[A,B](list: List[A], initial: B)(f: (B, A) => B): B = {
+    foldRight(reverse(list), initial)((a, b) => f(b, a))
+  }
+
+  def foldRight2[A,B](list: List[A], initial: B)(f: (A, B) => B): B = {
+    foldLeft(reverse(list), initial)((b, a) => f(a, b))
+  }
+
+  // 3.14
+  def append2[A](l1: List[A], l2: List[A]): List[A] = {
+    foldLeft(reverse(l1), l2)((b, a) => Cons(a, b))
+  }
+
+  // 3.15
+  def concatenate[A](list: List[List[A]]): List[A] = {
+    foldRight2[List[A], List[A]](list, Nil)((a, b) => append2(a, b))
+  }
+
+  // 3.16
+  def addOneToEach(list: List[Int]): List[Int] = {
+    foldRight2[Int,List[Int]](list, Nil)((a, b) => Cons(a + 1, b))
+  }
+
+  // 3.17
+  def flarp(list: List[Double]): List[String] = {
+    foldRight2[Double, List[String]](list, Nil)((a, b) => Cons(a.toString, b))
+  }
+
+  // 3.18
+  def map[A,B](list: List[A])(f: A => B): List[B] = {
+    foldRight2[A, List[B]](list, Nil)((a, b) => Cons(f(a), b))
+  }
+
+  // 3.19
+  def filter[A](as: List[A])(f: A => Boolean): List[A] = {
+    foldRight2[A, List[A]](reverse(as), Nil)((a, b) => if (f(a)) Cons(a, b) else b)
+  }
+
+  // 3.20
+  def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] = {
+    foldRight2[A, List[B]](as, Nil)((a, b) => append2(f(a), b))
+  }
+
+  // 3.21
+  def filter2[A](as: List[A])(f: A => Boolean): List[A] = {
+    flatMap(as)(x => if (f(x)) List(x) else Nil)
+  }
+
+  // 3.22
+  def addElems(l1: List[Int], l2: List[Int]): List[Int] = {
+    (l1, l2) match {
+      case (Cons(a, as), Cons(b, bs)) => Cons(a + b, addElems(as, bs))
+      case _ => Nil
+    }
+  }
+
+  // 3.23
+  def zipWith[A,B,C](l1: List[A], l2: List[B])(f: (A, B) => C): List[C] = {
+    (l1, l2) match {
+      case (Cons(a, as), Cons(b, bs)) => Cons(f(a, b), zipWith(as, bs)(f))
+      case _ => Nil
+    }
+  }
+
 }
