@@ -3,7 +3,8 @@ package exercises
 import org.scalatest.FlatSpec
 
 class Chapter4Spec extends FlatSpec {
-  import scala.{Option => _, Some => _, None => _, Either => _, _} // hide std library `Option`, `Some` and `Either`, since we are writing our own in this chapter
+  import scala.{Option => _, Some => _, None => _, Either => _, Left => _, Right => _, _} // hide std library `Option`, `Some` and `Either`, since we are writing our own in this chapter
+
   import exercises.Chapter4._
 
   "Option.map" should "map" in {
@@ -44,11 +45,32 @@ class Chapter4Spec extends FlatSpec {
     assert(Option.map2(None: Option[Int], None)(_ + _) == None)
   }
 
-  "Option.sequence" should "convert a list of Options to an Optional list..." in {
+  "Option.sequence2" should "convert a list of Options to an Optional list..." in {
+    assert(Option.sequence2(List(Some(1), Some(2))) == Some(List(1,2)))
+    assert(Option.sequence2(List(None, Some(2))) == None)
+    assert(Option.sequence2(List(Some(2), None)) == None)
+    assert(Option.sequence2(Nil) == Some(Nil))
+  }
+
+  "Option.sequence" should "..." in {
     assert(Option.sequence(List(Some(1), Some(2))) == Some(List(1,2)))
     assert(Option.sequence(List(None, Some(2))) == None)
     assert(Option.sequence(List(Some(2), None)) == None)
     assert(Option.sequence(Nil) == Some(Nil))
   }
+
+  "Either.map" should "map over Right value" in {
+    assert(Right(1).map(_ * 2) == Right(2))
+    assert((Left(1): Either[Int, Int]).map(_ * 2) == Left(1))
+  }
+
+  "Either.flatMap" should "map, flatly, over Right value" in {
+    assert(Right(1).flatMap(x => Right(x * 2)) == Right(2))
+    assert((Left(1): Either[Int, Int]).flatMap(x => Right(x * 2)) == Left(1))
+    assert(Right(1).flatMap(x => Left(x * 2)) == Left(2))
+    assert((Left(1): Either[Int, Int]).flatMap(x => Left(x * 2)) == Left(1))
+  }
+
+  // "Either."
 
 }
