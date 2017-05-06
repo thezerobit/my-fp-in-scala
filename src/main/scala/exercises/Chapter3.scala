@@ -260,6 +260,20 @@ object Chapter3 {
       case Branch(l, r) => Branch(map(l)(f), map(r)(f))
     }
 
+    // 3.29
+    def fold[A,B](tree: Tree[A])(f: A => B)(c: (B, B) => B): B = tree match {
+      case Leaf(x) => f(x)
+      case Branch(l, r) => c(fold(l)(f)(c), fold(r)(f)(c))
+    }
+
+    def size2[A](tree: Tree[A]): Int = fold(tree)(_ => 1)(1 + _ + _)
+
+    def max2(tree: Tree[Int]): Int = fold(tree)(identity)(_ max _)
+
+    def depth2[A](tree: Tree[A]): Int = fold(tree)(_ => 1)(_ max _ + 1)
+
+    def map2[A,B](tree: Tree[A])(f: A => B): Tree[B] =
+      fold[A,Tree[B]](tree)(x => Leaf(f(x)))((l, r) => Branch(map2(l)(identity), map2(r)(identity)))
   }
 
 }

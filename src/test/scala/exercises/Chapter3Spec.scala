@@ -142,6 +142,29 @@ class Chapter3Spec extends FlatSpec {
     assert(Tree.depth(Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))) == 3)
   }
 
+  "Tree.map" should "map the function over the leaves of the tree" in {
+    assert(Tree.map(Branch(Leaf(1), Branch(Leaf(2), Leaf(3))))(x => x * 2) ==
+      Branch(Leaf(2), Branch(Leaf(4), Leaf(6)))
+    )
+  }
 
+  "Tree.size2" should "count the leaves and branches" in {
+    assert(Tree.size2(Branch(Leaf(1), Leaf(2))) == 3)
+    assert(Tree.size2(Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))) == 5)
+  }
 
+  "Tree.max2" should "find the largest value in tree" in {
+    assert(Tree.max2(Branch(Leaf(1), Leaf(2))) == 2)
+    assert(Tree.max2(Branch(Branch(Leaf(1), Leaf(3)), Leaf(2))) == 3)
+  }
+
+  "Tree.depth2" should "find the maximum path length from root to leaf" in {
+    assert(Tree.depth2(Branch(Leaf(1), Branch(Leaf(2), Leaf(3)))) == 3)
+  }
+
+  "Tree.map2" should "map the function over the leaves of the tree" in {
+    assert(Tree.map2(Branch(Leaf(1), Branch(Leaf(2), Leaf(3))))(x => x * 2) ==
+      Branch(Leaf(2), Branch(Leaf(4), Leaf(6)))
+    )
+  }
 }
