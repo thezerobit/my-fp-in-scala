@@ -32,4 +32,23 @@ class Chapter4Spec extends FlatSpec {
     assert((None: Option[Int]).filter(_ % 2 == 0) == None)
   }
 
+  "Option.variance" should "calculate variance of a Sequence" in {
+    assert(Option.variance(Seq(1,2,3)) == Some(2.0/3.0))
+    assert(Option.variance(Seq.empty) == None)
+  }
+
+  "Option.map2" should "allow a binary function to operate on 2 Optional values" in {
+    assert(Option.map2(Some(1), Some(2))(_ + _) == Some(3))
+    assert(Option.map2(None: Option[Int], Some(2))(_ + _) == None)
+    assert(Option.map2(Some(1), None)(_ + _) == None)
+    assert(Option.map2(None: Option[Int], None)(_ + _) == None)
+  }
+
+  "Option.sequence" should "convert a list of Options to an Optional list..." in {
+    assert(Option.sequence(List(Some(1), Some(2))) == Some(List(1,2)))
+    assert(Option.sequence(List(None, Some(2))) == None)
+    assert(Option.sequence(List(Some(2), None)) == None)
+    assert(Option.sequence(Nil) == Some(Nil))
+  }
+
 }
