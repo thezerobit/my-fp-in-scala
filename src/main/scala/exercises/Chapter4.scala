@@ -96,16 +96,19 @@ object Chapter4 {
   sealed trait Either[+E,+A] {
     // 4.6
     def map[B](f: A => B): Either[E, B] = this match {
-      case Left(e) => Left(e)
       case Right(a) => Right(f(a))
+      case Left(e) => Left(e)
     }
 
     def flatMap[EE >: E, B](f: A => Either[EE, B]): Either[EE, B] = this match {
-      case Left(e) => Left(e)
       case Right(a) => f(a)
+      case Left(e) => Left(e)
     }
 
-    def orElse[EE >: E, B >: A](b: => Either[EE, B]): Either[EE, B] = this.flatMap(_ => b)
+    def orElse[EE >: E, B >: A](b: => Either[EE, B]): Either[EE, B] = this match {
+      case Right(a) => Right(a)
+      case Left(e) => b
+    }
 
     def map2[EE >: E, B, C](b: Either[EE, B])(f: (A, B) => C): Either[EE, C] =
       this.flatMap(a => b.map(b => f(a, b)))
@@ -114,9 +117,26 @@ object Chapter4 {
   case class Right[+A](get: A) extends Either[Nothing,A]
 
   object Either {
-    def traverse[E,A,B](es: List[A])(f: A => Either[E, B]): Either[E, List[B]] = ???
+    // 4.7
+    def traverse[E,A,B](es: List[A])(f: A => Either[E, B]): Either[E, List[B]] = {
+      @annotation.tailrec
+      def trav(list: List[A], accum: List[B]): Either[E, List[B]] = list match {
+        case a :: as => f(a) match {
+          case Right(b) => trav(as, b :: accum)
+          case Left(e) => Left(e)
+        }
+        case Nil => Right(accum.reverse)
+      }
+      trav(es, Nil)
+    }
 
-    def sequence[E,A](es: List[Either[E,A]]): Either[E,List[A]] = ???
+    def sequence[E,A](es: List[Either[E,A]]): Either[E,List[A]] = traverse(es)(identity)
+
+    // 4.8
+    // Some way to combine Left values (in this case appending the strings)
+    // I would change map2.
+    // I would use Either like this: Either[List[E],A], etc.
+    // Those functions would need to possibly combine the Left values
 
     def mean(xs: IndexedSeq[Double]): Either[String, Double] =
       if (xs.isEmpty)

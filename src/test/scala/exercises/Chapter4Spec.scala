@@ -71,6 +71,28 @@ class Chapter4Spec extends FlatSpec {
     assert((Left(1): Either[Int, Int]).flatMap(x => Left(x * 2)) == Left(1))
   }
 
-  // "Either."
+  "Either.orElse" should "return the first Right or try the next" in {
+    assert(Right(1).orElse(Right(2)) == Right(1))
+    assert(Left(1).orElse(Right(2)) == Right(2))
+    assert(Right(1).orElse(Left(2)) == Right(1))
+    assert(Left(1).orElse(Left(2)) == Left(2))
+  }
+
+  "Either.map2" should "map the right values over a binary function" in {
+    assert(Right(1).map2(Right(2))(_ + _) == Right(3))
+    assert((Left(1): Either[Int, Int]).map2(Right(2))(_ + _) == Left(1))
+    assert(Right(1).map2(Left(2))(_ + _) == Left(2))
+    assert((Left(1): Either[Int, Int]).map2(Left(2))(_ + _) == Left(1))
+  }
+
+  "Either.traverse" should "map or return the first Left" in {
+    assert(Either.traverse(List(1,2,3))(x => if (x == 2) Left("sad") else Right(x * 2)) == Left("sad"))
+    assert(Either.traverse(List(1,2,3))(x => if (x == 4) Left("sad") else Right(x * 2)) == Right(List(2,4,6)))
+  }
+
+  "Either.sequence" should "return List of right values or first Left" in {
+    assert(Either.sequence(List(Right(1),Right(2))) == Right(List(1,2)))
+    assert(Either.sequence(List(Right(1),Left(2),Left(3)): List[Either[Int,Int]]) == Left(2))
+  }
 
 }
