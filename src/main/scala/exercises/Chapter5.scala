@@ -71,8 +71,75 @@ object Chapter5 {
     def flatMap[B >: A](f: A => Stream[B]): Stream[B] =
       foldRight(empty[B])((a, b) => f(a).append(b))
 
+    // 5.13
+    def map2[B](f: A => B): Stream[B] =
+      unfold(this: Stream[A])({
+        case Cons(h, t) => Some((f(h()), t()))
+        case Empty => None
+      })
 
-    def startsWith[B](s: Stream[B]): Boolean = ???
+    def take2(n: Int): Stream[A] =
+      unfold((n, this))(s => if (s._1 > 0) s._2 match {
+        case Cons(h, t) => Some(h(), (s._1 - 1, t()))
+        case Empty => None
+      } else None)
+
+    def takeWhile3(p: A => Boolean): Stream[A] =
+      unfold(this)({
+        case Cons(h, t) => if (p(h())) Some(h(), t()) else None
+        case Empty => None
+      })
+
+    def zipWith[B, C](s2: Stream[B])(f: (A, B) => C): Stream[C] =
+      unfold((this, s2))({
+        case (Cons(h1, t1),Cons(h2, t2)) => Some(f(h1(), h2()), (t1(), t2()))
+        case _ => None
+      })
+
+    def tailOption: Option[Stream[A]] = this match {
+      case Cons(_, t) => Some(t())
+      case _ => None
+    }
+
+    def zipAll[B](s2: Stream[B]): Stream[(Option[A],Option[B])] =
+      unfold((this, s2))({
+        case (Cons(h1, t1), Cons(h2, t2)) => Some(((Some(h1()),Some(h2())), (t1(),t2())))
+        case (Cons(h1, t1), Empty) => Some(((Some(h1()),None), (t1(),Empty)))
+        case (Empty, Cons(h2, t2)) => Some(((None,Some(h2())), (Empty,t2())))
+        case _ => None
+      })
+
+    // 5.14
+    def startsWith[B](s: Stream[B]): Boolean =
+      zipAll(s).filter(x => x._1 != x._2).forAll(x => x._1.isDefined && x._2.isEmpty)
+
+    // 5.15
+    def tails: Stream[Stream[A]] =
+      unfold(Some(this): Option[Stream[A]])({
+        case Some(s) => Some(s, s.tailOption)
+        case None => None
+      })
+
+    def hasSubsequence[B >: A](s: Stream[B]): Boolean =
+      tails exists (_ startsWith s)
+
+//    def foldRight[B](z: => B)(f: (A, => B) => B): B = // The arrow `=>` in front of the argument type `B` means that the function `f` takes its second argument by name and may choose not to evaluate it.
+//      this match {
+//        case Cons(h,t) => f(h(), t().foldRight(z)(f)) // If `f` doesn't evaluate its second argument, the recursion never occurs.
+//        case _ => z
+//      }
+
+//    def scanRight[B](z: => B)(f: (A, => B) => B): Stream[B] =
+//      this match {
+//        case Cons(h,t) => val tail = t().scanRight(z)(f)
+//          tail match {
+//            case Cons(h2, t2) => cons(f(h(), h2()), t2())
+//            case _ => ???
+//          }
+//        case _ => Stream(z)
+//      }
+
+
   }
   case object Empty extends Stream[Nothing]
   case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
@@ -114,6 +181,13 @@ object Chapter5 {
         case None => empty[A]
       }
 
-  }
+    // 5.12
+    def fibs2: Stream[Int] = unfold((0,1))(s => Some((s._1, (s._2, s._1 + s._2))))
 
+    def from2(n: Int): Stream[Int] = unfold(n)(s => Some(s, s + 1))
+
+    def constant2[A](a: A): Stream[A] = unfold(a)(s => Some(s, s))
+
+    val ones2: Stream[Int] = unfold(1)(_ => Some(1, 1))
+  }
 }

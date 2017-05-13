@@ -69,4 +69,61 @@ class Chapter5Spec extends FlatSpec {
       == List(10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0))
   }
 
+  "Stream.fibs2" should "produce fibonacci sequence stream" in {
+    assert(Stream.fibs2.take(7).toList == List(0,1,1,2,3,5,8))
+  }
+
+  "Stream.from2" should "produce stream of incrementing integers" in {
+    assert(Stream.from2(5).take(5).toList == List(5,6,7,8,9))
+  }
+
+  "Stream.constant2" should "produce infinite stream of the value" in {
+    assert(Stream.constant2(2).take(5).toList == List(2,2,2,2,2))
+  }
+
+  "Stream.ones2" should "produce a stream of 1" in {
+    assert(Stream.ones2.take(4).toList == List(1,1,1,1))
+  }
+
+  "Stream.map2" should "map lazily" in {
+    assert(Stream(1,2,3).map2(_ * 2).toList == List(2,4,6))
+  }
+
+  "Stream.take2" should "take from the front of the stream" in {
+    assert(Stream(1,2,3).take2(2).toList == List(1,2))
+  }
+
+  "Stream.takeWhile3" should "take elements while the predicate is satisfied" in {
+    assert(Stream(1,2,3,4,5).takeWhile3(_ <= 2).toList == List(1,2))
+  }
+
+  "Stream.zipWith" should "zipWith lazily" in {
+    assert(Stream(1,2,3,4,5).zipWith(Stream(10,20,30))(_ + _).toList == List(11,22,33))
+  }
+
+  "Stream.zipAll" should "zipAll the values" in {
+    assert(Stream(1, 2).zipAll(Stream("A", "B", "C")).toList
+      == List((Some(1), Some("A")), (Some(2), Some("B")), (None, Some("C"))))
+  }
+
+  "Stream.startsWith" should "detect if a stream starts with another" in {
+    assert(Stream(1,2).startsWith(Stream(1)))
+    assert(Stream(1,2).startsWith(Stream(1,2)))
+    assert(!Stream(1).startsWith(Stream(1,2)))
+  }
+
+  "Stream.tails" should "return the tails of a stream" in {
+    assert(Stream(1,2,3).tails.map(_.toList).toList == List(List(1,2,3), List(2,3), List(3), Nil))
+  }
+
+  "Stream.hasSubsequence" should "detect if a stream is a subsequence" in {
+    assert(Stream(1,2,3,4,5).hasSubsequence(Stream(2,3,4)))
+    assert(!Stream(1,2,3,4,5).hasSubsequence(Stream(2,3,5)))
+
+  }
+
+//  "Stream.scanRight" should "scan from teh right/?" in {
+//    assert(Stream(1,2,3).scanRight(0)(_ + _).toList == List(6,5,3,0))
+//  }
+
 }
